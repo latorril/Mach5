@@ -19,7 +19,6 @@
                 
         $("#btn_test").click(function () {
             csInterface.evalScript('sayHello()');
-            alert("Something ELSE!");
         });
     }
         
