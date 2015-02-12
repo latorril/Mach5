@@ -33,7 +33,7 @@ try {
     var nyt_png_info_xml = nyt_png_info.textFrames.add();
     
     var saved_data = new XML( '<nyt_prefs></nyt_prefs>' );
-    saved_data.appendChild( new XML('<nyt_ppi>true</nyt_ppi>') );
+    saved_data.appendChild( new XML('<nyt_ppi>72</nyt_ppi>') );
     saved_data.appendChild( new XML('<nyt_prefix></nyt_prefix>') );
     saved_data.appendChild( new XML('<nyt_path>~/Desktop</nyt_path>') );
 
@@ -93,8 +93,13 @@ function nyt_show_png_dialog() {
     ppiGrp.orientation = 'row';
     ppiGrp.alignment = [ScriptUI.Alignment.LEFT, ScriptUI.Alignment.TOP]
     
-    var ppiCbx = ppiGrp.add('checkbox', undefined, ' ppi 192 resolution    ');
-    ppiCbx.value = (nyt_png_ppi.toString() === 'true');
+    var ppiSt = ppiGrp.add('statictext', undefined, 'Custom DPI:'); 
+    ppiSt.size = [100,20];
+    
+    var ppiInput = ppiGrp.add('edittext', undefined, '72');
+    ppiInput.text = nyt_png_ppi;
+    //ppiInput.value = (nyt_png_ppi.toString() === 'true');
+    ppiInput.characters = 4;
     //ppiCbx.shortcutKey = 'p';
 
     // PREFIX GRP
@@ -104,7 +109,7 @@ function nyt_show_png_dialog() {
 
 
     var prefixSt = prefixGrp.add('statictext', undefined, 'File prefix:'); 
-    prefixSt.size = [100,20]
+    prefixSt.size = [100,20];
 
     var prefixEt = prefixGrp.add('edittext', undefined, nyt_png_prefix); 
     prefixEt.size = [ 300,20 ];
@@ -124,7 +129,7 @@ function nyt_show_png_dialog() {
 
 
     nyt_png_dlg.progBar = nyt_png_dlg.msgPnl.add( 'progressbar', undefined, 0, 100 );
-    nyt_png_dlg.progBar.size = [400,10]
+    nyt_png_dlg.progBar.size = [400,10];
 
     nyt_png_dlg.progLabel = nyt_png_dlg.msgPnl.add('statictext', undefined, 'Will export ' + num_to_export + ' of ' + num_artboards + ' artboards in document' ); 
     nyt_png_dlg.progLabel.size = [ 400,20 ];
@@ -144,7 +149,7 @@ function nyt_show_png_dialog() {
     nyt_png_dlg.btnPnl.okBtn = nyt_png_dlg.btnPnl.add('button', undefined, 'Export', {name:'ok'});
     nyt_png_dlg.btnPnl.okBtn.onClick = function() { 
         nyt_png_prefix = prefixEt.text; 
-        nyt_png_ppi = ppiCbx.value; 
+        nyt_png_ppi = ppiInput.text; 
         nyt_run_export( num_to_export);   
         };
 
@@ -165,8 +170,8 @@ function nyt_run_export( num_to_export) {
         
         if ( ! ( artboardName.match(  /^artboard/ ) || artboardName.match( /^\-/ ) )){
             var png_ppi;
-            if ( nyt_png_ppi == true ){
-                png_ppi = (8/3)*100;
+            if ( nyt_png_ppi != '' ){
+                png_ppi = (nyt_png_ppi/72)*100;
             }
             else png_ppi = 100;
 
