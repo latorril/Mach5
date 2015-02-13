@@ -75,7 +75,7 @@ function nyt_show_png_dialog() {
     var num_to_export = 0;
 
     for (var i = 0; i < num_artboards; i++ ) {
-        var artboardName = docRef.artboards[i].name.toLowerCase();
+        var artboardName = docRef.artboards[i].name;
         if ( ! ( artboardName.match(  /^artboard/ ) || artboardName.match( /^\-/ ) )){
                 num_to_export++;
         }
@@ -86,7 +86,7 @@ function nyt_show_png_dialog() {
     nyt_png_dlg = new Window('dialog', 'Export Artboards'); 
 
     // PANEL to hold options
-    nyt_png_dlg.msgPnl = nyt_png_dlg.add('panel', undefined, 'Export Artboards as PNGs'); 
+    nyt_png_dlg.msgPnl = nyt_png_dlg.add('panel', undefined, 'Export Artboards'); 
 
     //PPI GRP
     var ppiGrp = nyt_png_dlg.msgPnl.add('group', undefined, '');
@@ -156,7 +156,7 @@ function nyt_show_png_dialog() {
     nyt_png_dlg.show();
 }
 
-function nyt_run_export( num_to_export) {
+function nyt_run_export( num_to_export ) {
 
     var num_exported = 0;
     
@@ -164,7 +164,7 @@ function nyt_run_export( num_to_export) {
 
     for (var i = 0; i < num_artboards; i++ ) {
 
-        var artboardName = docRef.artboards[i].name.toLowerCase();
+        var artboardName = docRef.artboards[i].name;
 
         // Skip artboards that start with "Artboard" or that start with a dash (-) 
         
@@ -179,15 +179,30 @@ function nyt_run_export( num_to_export) {
             
             var destFile = new File( nyt_png_base_path + "/" + nyt_png_prefix + artboardName  + ".png");    
             
-            var options = new ExportOptionsPNG24();
-            options.artBoardClipping = true;
-            options.matte = true;
-            options.horizontalScale = png_ppi;
-            options.verticalScale = png_ppi;
+            //export PNG
+            var optionsPNG24 = new ExportOptionsPNG24();
+            optionsPNG24.artBoardClipping = true;
+            optionsPNG24.matte = true;
+            optionsPNG24.horizontalScale = png_ppi;
+            optionsPNG24.verticalScale = png_ppi;
                 
             docRef.artboards.setActiveArtboardIndex(i);
             
-            docRef.exportFile (destFile, ExportType.PNG24, options);  
+            docRef.exportFile (destFile, ExportType.PNG24, optionsPNG24);
+            
+            //export AI
+            
+            var destFileAI = new File( nyt_png_base_path + "/" + docRef.name + ".ai");
+            
+            var optionsAI = new IllustratorSaveOptions();
+            //docRef.artboards.setActiveArtboardIndex(i);
+            
+            var range = '';
+            var currentArtBoardNumber = i + 1;
+            optionsAI.saveMultipleArtboards = true;
+            optionsAI.artboardRange = range.concat( currentArtBoardNumber, '-', currentArtBoardNumber );
+            docRef.saveAs(destFileAI, optionsAI);
+            
             num_exported++;
             
             nyt_png_dlg.progLabel.text = 'Exported ' + num_exported + ' of ' + num_to_export;
