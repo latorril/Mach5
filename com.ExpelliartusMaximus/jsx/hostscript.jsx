@@ -14,6 +14,9 @@ var nyt_png_ppi;
 var nyt_png_prefix;      // file prefix
 var nyt_png_base_path;    // base path
 
+var nyt_png_exportPNG;
+var nyt_png_exportAI;
+
 var nyt_png_xml; 
 
 var nyt_png_dlg;
@@ -36,12 +39,15 @@ try {
     saved_data.appendChild( new XML('<nyt_ppi>72</nyt_ppi>') );
     saved_data.appendChild( new XML('<nyt_prefix></nyt_prefix>') );
     saved_data.appendChild( new XML('<nyt_path>~/Desktop</nyt_path>') );
+    saved_data.appendChild( new XML('<nyt_exportPNG>true</nyt_exportPNG>') );
+    saved_data.appendChild( new XML('<nyt_exportAI>false</nyt_exportAI>') );
 
     nyt_png_info_xml.contents = saved_data.toXMLString();    
     
+    // Make XML invisible in doc
     nyt_png_info.printable = false;
     nyt_png_info.visible = false;
-    nyt_png_info.opactity = 0.0;
+    nyt_png_info.opacity = 0.0;
 }
 
 
@@ -58,6 +64,8 @@ if ( nyt_png_info.textFrames.length != 1 ) {
         nyt_png_ppi        = nyt_png_xml.nyt_ppi;
         nyt_png_prefix    = nyt_png_xml.nyt_prefix;
         nyt_png_base_path  = nyt_png_xml.nyt_path;
+        nyt_png_exportPNG   = nyt_png_xml.nyt_exportPNG;
+        nyt_png_exportAI   = nyt_png_xml.nyt_exportAI;
         nyt_parse_success = true;
     } catch ( e ) {
         Window.alert( 'Please delete the nyt_png_info layer and try again.' );
@@ -87,12 +95,13 @@ function nyt_show_png_dialog() {
     nyt_png_dlg = new Window('dialog', 'Export Artboards'); 
 
     // PANEL to hold options
-    nyt_png_dlg.msgPnl = nyt_png_dlg.add('panel', undefined, 'Export Artboards'); 
+    nyt_png_dlg.msgPnl = nyt_png_dlg.add('panel', undefined, ''); 
+
 
     // PREFIX GRP
     var prefixGrp = nyt_png_dlg.msgPnl.add('group', undefined, '');
     prefixGrp.orientation = 'row';
-    prefixGrp.alignment = [ScriptUI.Alignment.LEFT, ScriptUI.Alignment.TOP]
+    prefixGrp.alignment = [ScriptUI.Alignment.LEFT, ScriptUI.Alignment.TOP];
 
     var prefixSt = prefixGrp.add('statictext', undefined, 'File prefix:'); 
     prefixSt.size = [100,20];
@@ -101,10 +110,10 @@ function nyt_show_png_dialog() {
     prefixEt.size = [ 300,20 ];
 
 
-    // DIR GROUP
+    // DIR GRP
     var dirGrp = nyt_png_dlg.msgPnl.add( 'group', undefined, '');
     dirGrp.orientation = 'row'
-    dirGrp.alignment = [ScriptUI.Alignment.LEFT, ScriptUI.Alignment.TOP]
+    dirGrp.alignment = [ScriptUI.Alignment.LEFT, ScriptUI.Alignment.TOP];
 
     var dirSt = dirGrp.add('statictext', undefined, 'Output directory:'); 
     dirSt.size = [ 100,20 ];
@@ -112,19 +121,45 @@ function nyt_show_png_dialog() {
     var dirEt = dirGrp.add('edittext', undefined, nyt_png_base_path); 
     dirEt.size = [ 300,20 ];
     
+    dirGrp.separator = dirGrp.add('panel');
     
-    //PPI GRP
+    
+    // EXPORTTYPE GRP
+    var exportTypeGrp = nyt_png_dlg.msgPnl.add('group', undefined, '');
+    exportTypeGrp.alignment = [ScriptUI.Alignment.LEFT, ScriptUI.Alignment.TOP];
+    exportTypeGrp.orientation = 'row';
+    //exportTypeGrp.alignChildren = 'left';
+    
+    var exportPNGRad = exportTypeGrp.add('radiobutton', undefined, 'PNG');
+    var exportAIRad = exportTypeGrp.add('radiobutton', undefined, 'AI');
+    
+    exportPNGRad.value = ( nyt_png_exportPNG.toString() === 'true' );
+    exportAIRad.value = ( nyt_png_exportAI.toString() === 'true' );
+    
+    exportAIRad.onClick = function() { 
+        ppiGrp.enabled = false;
+        }
+    
+    exportPNGRad.onClick = function() { 
+        ppiGrp.enabled = true;
+        }
+
+    
+    // PPI GRP
     var ppiGrp = nyt_png_dlg.msgPnl.add('group', undefined, '');
     ppiGrp.orientation = 'row';
-    ppiGrp.alignment = [ScriptUI.Alignment.LEFT, ScriptUI.Alignment.TOP]
+    ppiGrp.alignment = [ScriptUI.Alignment.LEFT, ScriptUI.Alignment.TOP];
     
     var ppiSt = ppiGrp.add('statictext', undefined, 'Custom DPI:'); 
     ppiSt.size = [100,20];
     
     var ppiInput = ppiGrp.add('edittext', undefined, '72');
     ppiInput.text = nyt_png_ppi;
-    //ppiInput.value = (nyt_png_ppi.toString() === 'true');
     ppiInput.characters = 4;
+    
+    if ( exportPNGRad.value == false ){
+        ppiGrp.enabled = false;
+    }
     //ppiCbx.shortcutKey = 'p';
   
 
@@ -151,6 +186,8 @@ function nyt_show_png_dialog() {
     nyt_png_dlg.btnPnl.okBtn.onClick = function() { 
         nyt_png_prefix = prefixEt.text; 
         nyt_png_ppi = ppiInput.text; 
+        nyt_png_exportPNG = exportPNGRad.value;
+        nyt_png_exportAI = exportAIRad.value;
         nyt_run_export( num_to_export);   
         };
 
@@ -172,39 +209,43 @@ function nyt_run_export( num_to_export ) {
         // Skip artboards that start with "Artboard" or that start with a dash (-) 
         
         if ( ! ( artboardName.match(  /^artboard/ ) || artboardName.match( /^\-/ ) )){
-            var png_ppi;
-            if ( nyt_png_ppi != '' ){
-                png_ppi = (nyt_png_ppi/72)*100;
-            }
-            else png_ppi = 100;
-
-            //$.writeln( artboardName );
-            
-            var destFile = new File( nyt_png_base_path + "/" + nyt_png_prefix + artboardName  + ".png");    
             
             //export PNG
-            var optionsPNG24 = new ExportOptionsPNG24();
-            optionsPNG24.artBoardClipping = true;
-            optionsPNG24.matte = true;
-            optionsPNG24.horizontalScale = png_ppi;
-            optionsPNG24.verticalScale = png_ppi;
+            if ( nyt_png_exportPNG == true ){
+                var png_ppi;
+                if ( nyt_png_ppi != '' ){
+                    png_ppi = (nyt_png_ppi/72)*100;
+                }
+                else png_ppi = 100;
                 
-            docRef.artboards.setActiveArtboardIndex(i);
-            
-            docRef.exportFile (destFile, ExportType.PNG24, optionsPNG24);
+                //$.writeln( artboardName );
+
+                var destFile = new File( nyt_png_base_path + "/" + nyt_png_prefix + artboardName  + ".png");    
+
+                var optionsPNG24 = new ExportOptionsPNG24();
+                optionsPNG24.artBoardClipping = true;
+                optionsPNG24.matte = true;
+                optionsPNG24.horizontalScale = png_ppi;
+                optionsPNG24.verticalScale = png_ppi;
+
+                docRef.artboards.setActiveArtboardIndex(i);
+                
+                docRef.exportFile (destFile, ExportType.PNG24, optionsPNG24);
+            }
             
             //export AI
-            
-            var destFileAI = new File( nyt_png_base_path + "/" + docRef.name + ".ai");
-            
-            var optionsAI = new IllustratorSaveOptions();
-            //docRef.artboards.setActiveArtboardIndex(i);
-            
-            var range = '';
-            var currentArtBoardNumber = i + 1;
-            optionsAI.saveMultipleArtboards = true;
-            optionsAI.artboardRange = range.concat( currentArtBoardNumber, '-', currentArtBoardNumber );
-            docRef.saveAs(destFileAI, optionsAI);
+            if ( nyt_png_exportAI == true ){
+                var destFileAI = new File( nyt_png_base_path + "/" + docRef.name + ".ai");
+
+                var optionsAI = new IllustratorSaveOptions();
+                //docRef.artboards.setActiveArtboardIndex(i);
+
+                var range = '';
+                var currentArtBoardNumber = i + 1;
+                optionsAI.saveMultipleArtboards = true;
+                optionsAI.artboardRange = range.concat( currentArtBoardNumber, '-', currentArtBoardNumber );
+                docRef.saveAs(destFileAI, optionsAI);
+            }
             
             num_exported++;
             
@@ -214,14 +255,16 @@ function nyt_run_export( num_to_export ) {
             ///progBar.notify("onDraw");
             
         }
+    }
+    
     // turn alerts back on for future use
     app.userInteractionLevel = UserInteractionLevel.DISPLAYALERTS;
-
-    }
     
     nyt_png_xml.nyt_ppi = nyt_png_ppi;
     nyt_png_xml.nyt_path = nyt_png_base_path;
     nyt_png_xml.nyt_prefix = nyt_png_prefix;
+    nyt_png_xml.nyt_exportPNG = nyt_png_exportPNG;
+    nyt_png_xml.nyt_exportAI = nyt_png_exportAI;
     
     nyt_png_info.textFrames[0].contents = nyt_png_xml.toXMLString();
     nyt_png_dlg.close();
