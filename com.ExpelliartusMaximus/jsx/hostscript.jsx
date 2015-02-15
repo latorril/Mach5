@@ -5,7 +5,7 @@
 function sayHello(){
     //http://www.ericson.net/files/illustrator-scripts/Export-Named-Artboards-as-PNG.jsx
 
-var docRef = app.activeDocument;    
+var docRef = app.activeDocument;
 
 // some globals
 var nyt_png_info;         // layer to save our settings on
@@ -41,6 +41,7 @@ try {
     
     nyt_png_info.printable = false;
     nyt_png_info.visible = false;
+    nyt_png_info.opactity = 0.0;
 }
 
 
@@ -88,25 +89,10 @@ function nyt_show_png_dialog() {
     // PANEL to hold options
     nyt_png_dlg.msgPnl = nyt_png_dlg.add('panel', undefined, 'Export Artboards'); 
 
-    //PPI GRP
-    var ppiGrp = nyt_png_dlg.msgPnl.add('group', undefined, '');
-    ppiGrp.orientation = 'row';
-    ppiGrp.alignment = [ScriptUI.Alignment.LEFT, ScriptUI.Alignment.TOP]
-    
-    var ppiSt = ppiGrp.add('statictext', undefined, 'Custom DPI:'); 
-    ppiSt.size = [100,20];
-    
-    var ppiInput = ppiGrp.add('edittext', undefined, '72');
-    ppiInput.text = nyt_png_ppi;
-    //ppiInput.value = (nyt_png_ppi.toString() === 'true');
-    ppiInput.characters = 4;
-    //ppiCbx.shortcutKey = 'p';
-
     // PREFIX GRP
     var prefixGrp = nyt_png_dlg.msgPnl.add('group', undefined, '');
     prefixGrp.orientation = 'row';
     prefixGrp.alignment = [ScriptUI.Alignment.LEFT, ScriptUI.Alignment.TOP]
-
 
     var prefixSt = prefixGrp.add('statictext', undefined, 'File prefix:'); 
     prefixSt.size = [100,20];
@@ -123,11 +109,26 @@ function nyt_show_png_dialog() {
     var dirSt = dirGrp.add('statictext', undefined, 'Output directory:'); 
     dirSt.size = [ 100,20 ];
 
-
     var dirEt = dirGrp.add('edittext', undefined, nyt_png_base_path); 
     dirEt.size = [ 300,20 ];
+    
+    
+    //PPI GRP
+    var ppiGrp = nyt_png_dlg.msgPnl.add('group', undefined, '');
+    ppiGrp.orientation = 'row';
+    ppiGrp.alignment = [ScriptUI.Alignment.LEFT, ScriptUI.Alignment.TOP]
+    
+    var ppiSt = ppiGrp.add('statictext', undefined, 'Custom DPI:'); 
+    ppiSt.size = [100,20];
+    
+    var ppiInput = ppiGrp.add('edittext', undefined, '72');
+    ppiInput.text = nyt_png_ppi;
+    //ppiInput.value = (nyt_png_ppi.toString() === 'true');
+    ppiInput.characters = 4;
+    //ppiCbx.shortcutKey = 'p';
+  
 
-
+    //PROGRESS BAR
     nyt_png_dlg.progBar = nyt_png_dlg.msgPnl.add( 'progressbar', undefined, 0, 100 );
     nyt_png_dlg.progBar.size = [400,10];
 
@@ -157,7 +158,9 @@ function nyt_show_png_dialog() {
 }
 
 function nyt_run_export( num_to_export ) {
-
+    //do not ask user if they want to overwrite - of course they do...
+    app.userInteractionLevel = UserInteractionLevel.DONTDISPLAYALERTS;
+    
     var num_exported = 0;
     
     var num_artboards = docRef.artboards.length; 
@@ -210,10 +213,9 @@ function nyt_run_export( num_to_export ) {
             nyt_png_dlg.update();
             ///progBar.notify("onDraw");
             
-         }
-     
-
-        
+        }
+    // turn alerts back on for future use
+    app.userInteractionLevel = UserInteractionLevel.DISPLAYALERTS;
 
     }
     
