@@ -235,7 +235,9 @@ function nyt_run_export( num_to_export ) {
             
             //export AI
             if ( nyt_png_exportAI == true ){
-                var destFileAI = new File( nyt_png_base_path + "/" + docRef.name + ".ai");
+            
+                var docName = docRef.name.replace('.ai','');
+                var destFileAI = new File( nyt_png_base_path + "/" + docRef.name );
 
                 var optionsAI = new IllustratorSaveOptions();
                 //docRef.artboards.setActiveArtboardIndex(i);
