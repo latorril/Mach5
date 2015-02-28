@@ -4,4 +4,4 @@
 #echo $?
 
 #java -jar ucf.jar -package -storetype PKCS12 -keystore myCert.p12 -storepass mypasswd -tsa https://timestamp.geotrust.com/tsa myExtension.zxp -C ./myExtension .
-java -jar signingtoolkit/ucf.jar -package  ../bin/ExpelliartusMaximus.zxp -C .. .
+java -jar signingtoolkit/ucf.jar -package -storetype PKCS12 -keystore ../cert.p12 -storepass "brains!" -tsa https://timestamp.geotrust.com/tsa ../bin/ExpelliartusMaximus.zxp -C .. .
