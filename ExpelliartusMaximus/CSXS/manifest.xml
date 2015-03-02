@@ -37,11 +37,14 @@
 		<Extension Id="com.ExpelliartusMaximus">
 			<DispatchInfo >
 				<Resources>
-				<MainPath>./index.html</MainPath>
-				<ScriptPath>./jsx/hostscript.jsx</ScriptPath>
+    				<MainPath>./index.html</MainPath>
+	   			    <ScriptPath>./jsx/hostscript.jsx</ScriptPath>
 				</Resources>
 				<Lifecycle>
 					<AutoVisible>true</AutoVisible>
+                    <StartOn>
+                        <Event>applicationActivate</Event>
+                    </StartOn>
 				</Lifecycle>
 				<UI>
 					<Type>Panel</Type>

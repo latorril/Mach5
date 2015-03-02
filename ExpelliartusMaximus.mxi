@@ -1,0 +1,41 @@
+﻿<macromedia-extension
+	 name="Expelliartus Maximus"
+	 version="1.0.0"
+   	 requires-restart="true">
+	<author name="Lumos Labs" />
+	<products>
+		<product name="Illustrator" version="15" primary="true" />
+	</products>
+	<description>
+	<![CDATA[
+	LumosExporter will export bitmaps of specifcally named layers to targeted resolutions.
+	It supports export naming conventions for Android, iOS and ofxG.
+	 - Name a layer with the following syntax: +image:FileNameWithoutExtension
+     - Select one or more layers (ie. select all to export all named layers)
+     - Choose File->Scripts->LumosExporter
+     - Use the dialog to choose export platforms, and the export path.
+     - Go!
+	]]>
+	</description>
+	<ui-access>
+	<![CDATA[
+	Once this extension is installed, Menu item File>Scripts>LumosExporter will be added. On disabling, it will be removed from the menu. 
+	]]>
+	</ui-access>
+	<license-agreement>
+	<![CDATA[
+	]]>
+	</license-agreement>
+	<files>
+		<file source="" destination="" shared="true" />
+	</files>
+	<ExtensionUpdateInformation>
+		<version>1.0.2</version>
+		<download>https://github.com/lumoslabs/expelliartus/blob/master/bin/ExpelliartusMaximus.zxp</download>
+		<description>
+			<![CDATA[
+			The 1.0.0 version fixes known UI for Illustrator CC.
+			New features include the ability to download updates. ]]>
+		</description>
+	</ExtensionUpdateInformation>
+</macromedia-extension>

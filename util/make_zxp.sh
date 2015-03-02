@@ -6,5 +6,7 @@
 
 #java -jar ucf.jar -package -storetype PKCS12 -keystore myCert.p12 -storepass mypasswd -tsa https://timestamp.geotrust.com/tsa myExtension.zxp -C ./myExtension .
 #java -jar signingtoolkit/ucf.jar -package -storetype PKCS12 -keystore ../cert.p12 -storepass lumosity -tsa https://timestamp.geotrust.com/tsa ../bin/ExpelliartusMaximus.zxp -C .. .
-rm ../bin/ExpelliartusMaximus.zxp
-./ZXPSignCmd -sign ../ExpelliartusMaximus ../bin/ExpelliartusMaximus.zxp ../ExpelliartusMaximus/cert.p12 lumosity -tsa https://timestamp.geotrust.com/tsa
+if [ -f ../bin/ExpelliartusMaximus.zxp ]; then
+    rm ../bin/ExpelliartusMaximus.zxp
+fi
+./ZXPSignCmd -sign ../ExpelliartusMaximus ../bin/ExpelliartusMaximus.zxp cert.p12 lumosity -tsa https://timestamp.geotrust.com/tsa
